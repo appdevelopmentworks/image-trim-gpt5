@@ -1,0 +1,48 @@
+{
+  "name": "image-trim-gpt5",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:web": "next dev",
+    "dev:desktop": "node scripts/dev-desktop.mjs",
+    "build:web": "next build",
+    "lint": "next lint",
+    "test": "vitest",
+    "bench:canvas": "tsx scripts/benchmarks/canvas-benchmark.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,css,md}\""
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "1.0.2",
+    "class-variance-authority": "0.7.0",
+    "clsx": "2.1.1",
+    "file-saver": "2.0.5",
+    "jszip": "3.10.1",
+    "lucide-react": "0.468.0",
+    "next": "14.2.5",
+    "next-themes": "0.3.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-dropzone": "14.2.3",
+    "react-easy-crop": "5.0.6",
+    "tailwind-merge": "2.5.2",
+    "zustand": "4.5.2"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "0.1.58",
+    "electron": "31.2.0",
+    "@types/file-saver": "2.0.7",
+    "@types/node": "20.17.5",
+    "@types/react": "18.3.7",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.5",
+    "postcss": "8.4.47",
+    "prettier": "3.3.3",
+    "tailwindcss": "3.4.13",
+    "typescript": "5.6.3",
+    "tsx": "4.19.2",
+    "vitest": "2.1.4"
+  },
+  "packageManager": "pnpm@9.12.0"
+}
