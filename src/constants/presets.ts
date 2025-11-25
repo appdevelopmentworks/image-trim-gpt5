@@ -6,6 +6,15 @@ export const PRESET_GROUPS: PresetGroup[] = [
     label: 'SNS用',
     options: [
       {
+        id: 'auto-adjust',
+        label: '自動調整（縦横判別）',
+        description: '縦横を自動判別し、枠内にフィット\n(1600x1600 / 縦横比維持 / 縦横自動判別ON)',
+        width: 1600,
+        height: 1600,
+        keepAspectRatio: true,
+        autoOrientation: true
+      },
+      {
         id: 'instagram-square',
         label: 'Instagram 正方形',
         description: '1080 × 1080 px',

@@ -5,8 +5,8 @@ import { create } from 'zustand';
 import type { CropSettings, ExportSettings, ImageItem, ProcessStatus } from '@/lib/types';
 
 const defaultSettings: ExportSettings = {
-  targetWidth: 1080,
-  targetHeight: 1080,
+  targetWidth: 1600,
+  targetHeight: 1600,
   keepAspectRatio: true,
   autoOrientation: true,
   format: 'image/jpeg',

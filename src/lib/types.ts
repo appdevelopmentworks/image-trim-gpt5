@@ -39,6 +39,8 @@ export interface PresetOption {
   description: string;
   width: number;
   height: number;
+  keepAspectRatio?: boolean;
+  autoOrientation?: boolean;
 }
 
 export interface PresetGroup {

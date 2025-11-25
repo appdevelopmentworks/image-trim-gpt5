@@ -5,6 +5,7 @@ import JSZip from 'jszip';
 import { Download, SlidersHorizontal, Trash2 } from 'lucide-react';
 
 import { PRESET_GROUPS } from '@/constants/presets';
+import type { PresetOption } from '@/lib/types';
 import { saveBlobWithDesktopFallback } from '@/lib/desktop-bridge';
 import { processImage } from '@/lib/image-process';
 import { buildExportFilename, buildZipFilename } from '@/lib/utils';
@@ -30,8 +31,15 @@ export function SettingsPanel() {
   const updateImageStatus = useImageStore((state) => state.updateImageStatus);
   const [isExporting, setIsExporting] = useState(false);
 
-  const applyPreset = (width: number, height: number) => {
-    updateGlobalSettings({ targetWidth: width, targetHeight: height });
+  const applyPreset = (preset: PresetOption) => {
+    updateGlobalSettings({
+      targetWidth: preset.width,
+      targetHeight: preset.height,
+      keepAspectRatio:
+        preset.keepAspectRatio !== undefined ? preset.keepAspectRatio : globalSettings.keepAspectRatio,
+      autoOrientation:
+        preset.autoOrientation !== undefined ? preset.autoOrientation : globalSettings.autoOrientation
+    });
   };
 
   const hasImages = images.length > 0;
@@ -102,27 +110,38 @@ export function SettingsPanel() {
             プリセット
           </p>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {PRESET_GROUPS.map((group) => (
             <div key={group.id} className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">{group.label}</p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-muted-foreground">{group.label}</p>
+                {group.id === 'social' && (
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                    新
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {group.options.map((option) => (
                   <Button
                     key={option.id}
                     type="button"
                     variant={
                       globalSettings.targetWidth === option.width &&
-                      globalSettings.targetHeight === option.height
+                      globalSettings.targetHeight === option.height &&
+                      (option.keepAspectRatio === undefined ||
+                        option.keepAspectRatio === globalSettings.keepAspectRatio) &&
+                      (option.autoOrientation === undefined ||
+                        option.autoOrientation === globalSettings.autoOrientation)
                         ? 'default'
                         : 'outline'
                     }
-                    className="justify-start text-left"
-                    onClick={() => applyPreset(option.width, option.height)}
+                    className="justify-start text-left min-h-[64px] py-3"
+                    onClick={() => applyPreset(option)}
                   >
                     <span className="text-sm">
                       {option.label}
-                      <span className="block text-xs text-muted-foreground">
+                      <span className="block whitespace-pre-line text-xs text-muted-foreground">
                         {option.description}
                       </span>
                     </span>
@@ -223,7 +242,10 @@ export function SettingsPanel() {
           </div>
 
           <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/20 p-3">
-            <label className="flex items-start gap-3 text-sm">
+            <label
+              className="flex cursor-pointer items-start gap-3 rounded-md p-2 hover:bg-background/60 text-sm"
+              onClick={() => updateGlobalSettings({ keepAspectRatio: !globalSettings.keepAspectRatio })}
+            >
               <input
                 type="checkbox"
                 className="mt-1 h-4 w-4 accent-primary"
@@ -237,7 +259,10 @@ export function SettingsPanel() {
                 </span>
               </div>
             </label>
-            <label className="flex items-start gap-3 text-sm">
+            <label
+              className="flex cursor-pointer items-start gap-3 rounded-md p-2 hover:bg-background/60 text-sm"
+              onClick={() => updateGlobalSettings({ autoOrientation: !globalSettings.autoOrientation })}
+            >
               <input
                 type="checkbox"
                 className="mt-1 h-4 w-4 accent-primary"
