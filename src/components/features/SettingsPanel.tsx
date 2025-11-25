@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
 import { Download, SlidersHorizontal, Trash2 } from 'lucide-react';
 
 import { PRESET_GROUPS } from '@/constants/presets';
+import { saveBlobWithDesktopFallback } from '@/lib/desktop-bridge';
 import { processImage } from '@/lib/image-process';
-import { buildExportFilename, buildZipFilename, downloadBlob } from '@/lib/utils';
+import { buildExportFilename, buildZipFilename } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -54,6 +54,8 @@ export function SettingsPanel() {
             targetHeight: globalSettings.targetHeight,
             format: globalSettings.format,
             quality: globalSettings.quality,
+            autoOrient: globalSettings.autoOrientation,
+            keepAspectRatio: globalSettings.keepAspectRatio,
             crop: image.cropArea
           });
 
@@ -76,7 +78,7 @@ export function SettingsPanel() {
 
       if (processedFiles.length === 1) {
         const [file] = processedFiles;
-        downloadBlob(file.blob, file.filename);
+        await saveBlobWithDesktopFallback(file.blob, file.filename);
         return;
       }
 
@@ -86,7 +88,7 @@ export function SettingsPanel() {
       });
 
       const archive = await zip.generateAsync({ type: 'blob' });
-      saveAs(archive, buildZipFilename());
+      await saveBlobWithDesktopFallback(archive, buildZipFilename());
     } finally {
       setIsExporting(false);
     }
@@ -169,6 +171,20 @@ export function SettingsPanel() {
               />
             </div>
           </div>
+          <label className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-sm">
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-primary"
+              checked={globalSettings.keepAspectRatio}
+              onChange={(event) => updateGlobalSettings({ keepAspectRatio: event.target.checked })}
+            />
+            <div className="flex flex-col">
+              <span className="font-medium">縦横比を自動調整</span>
+              <span className="text-xs text-muted-foreground">
+                元画像（またはクロップ領域）の縦横比を維持し、指定サイズ内にフィットさせます
+              </span>
+            </div>
+          </label>
 
           <div className="space-y-1">
             <Label htmlFor="format">ファイル形式</Label>
@@ -204,6 +220,37 @@ export function SettingsPanel() {
               }
               className="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted"
             />
+          </div>
+
+          <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/20 p-3">
+            <label className="flex items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 accent-primary"
+                checked={globalSettings.keepAspectRatio}
+                onChange={(event) => updateGlobalSettings({ keepAspectRatio: event.target.checked })}
+              />
+              <div className="flex flex-col">
+                <span className="font-medium">縦横比を維持してフィット</span>
+                <span className="text-xs text-muted-foreground">
+                  元画像（またはクロップ領域）の縦横比を保ったまま、指定サイズ内に収めます
+                </span>
+              </div>
+            </label>
+            <label className="flex items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 accent-primary"
+                checked={globalSettings.autoOrientation}
+                onChange={(event) => updateGlobalSettings({ autoOrientation: event.target.checked })}
+              />
+              <div className="flex flex-col">
+                <span className="font-medium">縦横を自動判別</span>
+                <span className="text-xs text-muted-foreground">
+                  縦長の画像は高さ優先、横長は幅優先で、出力幅/高さを自動で入れ替えます
+                </span>
+              </div>
+            </label>
           </div>
         </CardContent>
       </Card>

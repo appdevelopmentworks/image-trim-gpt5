@@ -11,12 +11,12 @@
 ## 2. タスクボード (バックログ/進行中/完了)
 | ID | タイトル | カテゴリ | 優先度 | 担当 | 状況 | 期限 | 備考 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| issue-01 | UI レイアウト初期構築 | Frontend | High | TBD | In Progress | Day 3 | App Router ページと shadcn/ui 導入 |
-| issue-02 | 画像トリミング PoC | Frontend | High | TBD | In Progress | Day 6 | react-easy-crop + Canvas のズーム検証 / UI トリミング + 出力 PoC 完了 |
-| issue-03 | 変換ロジック単体テスト | QA | Medium | TBD | In Progress | Day 7 | 10 枚/30 秒 KPI ベンチ + Vitest を整備 |
-| issue-04 | Electron IPC/保存処理 | Desktop | Medium | TBD | In Progress | Day 9 | `pnpm dev:desktop` で Electron + Next.dev を接続。次は IPC/ZIP 連携を実装 |
-| issue-05 | CI (Lint/Test/Build) パイプライン | DevOps | Medium | TBD | In Progress | Day 10 | GitHub Actions で lint/test/bench/build を自動実行 |
-| issue-06 | α リリース準備 | PM | Medium | TBD | In Progress | Day 14 | リリースノート・FAQ を docs/ に追加、配布手順整理 |
+| issue-01 | UI レイアウト初期構築 | Frontend | High | TBD | Done | Day 3 | App Router ページと shadcn/ui 導入済み |
+| issue-02 | 画像トリミング PoC | Frontend | High | TBD | Done | Day 6 | react-easy-crop + Canvas トリミング / プレビュー付き出力 PoC 完了 |
+| issue-03 | 変換ロジック単体テスト | QA | Medium | TBD | Done | Day 7 | 10 枚/30 秒 KPI ベンチ + Vitest を整備 |
+| issue-04 | Electron IPC/保存処理 | Desktop | Medium | TBD | In Progress | Day 9 | 保存ダイアログ付き IPC save-file とアイコン適用を完了。残: ZIP/IPC 再利用と配布設計 |
+| issue-05 | CI (Lint/Test/Build) パイプライン | DevOps | Medium | TBD | Done | Day 10 | GitHub Actions で lint/test/bench/build を自動実行 |
+| issue-06 | α リリース準備 | PM | Medium | TBD | Done | Day 14 | リリースノート・FAQ を docs/ に追加済み |
 
 > 必要に応じてこの表に行を追加/更新してください。
 

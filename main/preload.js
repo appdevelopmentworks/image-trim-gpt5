@@ -1,5 +1,6 @@
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('desktopAPI', {
-  ping: () => 'pong'
+  ping: () => 'pong',
+  saveFile: (payload) => ipcRenderer.invoke('desktop:save-file', payload)
 });

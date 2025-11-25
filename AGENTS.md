@@ -22,7 +22,7 @@
 ## Testing Guidelines
 - Prefer colocated tests named `<file>.test.ts` or `<feature>.spec.tsx`.
 - Cover Canvas conversions with deterministic fixtures (10 images/30s KPI). Add Playwright/Electron smoke tests for E2E flows when touching UX-critical paths.
-- Run `pnpm test --runInBand` before large refactors to ensure deterministic snapshots.
+- Run `pnpm test run` (non-watch) before large refactors to ensure deterministic snapshots.
 
 ## Commit & Pull Request Guidelines
 - Use `feature/<issue-id>-short-desc` branches; commits should follow imperative Conventional Commit-style summaries (e.g., `feat: add crop modal state`).
@@ -34,13 +34,18 @@
 - Keep processing entirely client-side; never upload images to third parties.
 - Store environment secrets (if any) in `.env.local` and never commit them. Use `.env.example` to document required keys.
 
-## Current Development Status (2025-11-19)
+## Communication
+- ユーザーとの対話は日本語で行うこと。
+
+## Current Development Status (2025-11-20)
 - App shell（ヘッダー / 設定 / ドロップゾーン / 画像グリッド）は実装済みで、日本語UIへ翻訳済み。
-- `src/store/use-image-store.ts` と `src/lib/image-process.ts` を追加済み。まだUIから処理を呼び出していないため PoC を継続すること。
-- Electron 側 `pnpm dev:desktop` は `scripts/dev-desktop.mjs` の stub。Phase 3 で本実装予定。
-- 最新TODOは `TODO.md` に整理しているので、着手前に更新・参照すること。
+- `src/store/use-image-store.ts` と `src/lib/image-process.ts` を UI から呼び出し、react-easy-crop のクロップ保存とミニプレビューを提供。
+- Canvas 単体テストと 10 枚/30 秒 KPI ベンチ整備済み。CI（lint/test/bench/build）も稼働中。
+- `docs/AppImg.jpg` を基に Web ファビコン（public/）と Electron アイコン（assets/）を生成・適用済み。縦横を自動判別して幅/高さを入れ替える設定と、縦横比フィットの自動リサイズを追加。
+- Electron 側 `pnpm dev:desktop` は `scripts/dev-desktop.mjs` の stub。Phase 3 で IPC/ZIP 連携と保存ダイアログを実装予定。
+- 最新 TODO は `TODO.md`、進捗は `docs/progress_tracker.md` に反映済み。
 
 ## Near-Term Focus
-1. issue-02（画像トリミングPoC）: react-easy-crop の導入と `image-process.ts` 連携。
-2. issue-03: Canvas ベンチマーク/テスト（10枚/30秒 KPI）を満たす検証。
-3. issue-04 以降を見据え、書き出し済みファイルのZIPダウンロードと Electron IPC 設計を並行検討。
+1. issue-04: Electron IPC/保存処理の実装（ZIP/保存ダイアログと Next.js レンダラー連携）。
+2. Canvas ベンチ/テストの CI 定期計測を強化（issue-03 フォロー）。
+3. Electron ビルド/配布の設計検討（Phase 3 以降）。

@@ -6,7 +6,14 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'クリエイター向け画像リサイズ',
-  description: '複数の画像を一括でリサイズ・トリミングできるデスクトップ/WEBツールです。'
+  description: '複数の画像を一括でリサイズ・トリミングできるデスクトップ/WEBツールです。',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', sizes: '64x64', type: 'image/png' }
+    ],
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

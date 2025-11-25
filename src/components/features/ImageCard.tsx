@@ -6,6 +6,7 @@ import { AlertTriangle, CheckCircle2, Crop, Loader2, Scissors, X } from 'lucide-
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import Cropper, { type Area } from 'react-easy-crop';
 
+import { createCropPreviewBlob } from '@/lib/image-process';
 import type { CropSettings, ImageItem } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,8 @@ export function ImageCard({ image }: Props) {
   const [localCrop, setLocalCrop] = useState(image.crop);
   const [localZoom, setLocalZoom] = useState(image.zoom);
   const [localArea, setLocalArea] = useState<Area | null>(toArea(image.cropArea));
+  const [cropPreviewUrl, setCropPreviewUrl] = useState<string | null>(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
 
   useEffect(() => {
     if (isCropMode) return;
@@ -33,11 +36,82 @@ export function ImageCard({ image }: Props) {
     setLocalArea(toArea(image.cropArea));
   }, [image.crop, image.cropArea, image.zoom, isCropMode]);
 
+  useEffect(() => {
+    let active = true;
+    let cachedPreview: string | null = null;
+
+    const buildPreview = async () => {
+      if (!image.cropArea) {
+        setCropPreviewUrl(null);
+        setIsPreviewLoading(false);
+        return;
+      }
+
+      setIsPreviewLoading(true);
+      try {
+        const blob = await createCropPreviewBlob({
+          file: image.file,
+          crop: image.cropArea,
+          maxSize: 140
+        });
+        const url = URL.createObjectURL(blob);
+        if (!active) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        cachedPreview = url;
+        setCropPreviewUrl(url);
+      } catch (error) {
+        console.error('Failed to render crop preview', error);
+        if (active) {
+          setCropPreviewUrl(null);
+        }
+      } finally {
+        if (active) {
+          setIsPreviewLoading(false);
+        }
+      }
+    };
+
+    void buildPreview();
+
+    return () => {
+      active = false;
+      if (cachedPreview) {
+        URL.revokeObjectURL(cachedPreview);
+      }
+    };
+  }, [image.cropArea, image.file]);
+
+  const sourceAspect = useMemo(() => {
+    if (image.cropArea) {
+      return image.cropArea.width && image.cropArea.height
+        ? image.cropArea.width / image.cropArea.height
+        : 1;
+    }
+    if (image.originalHeight === 0) return 1;
+    return image.originalWidth / image.originalHeight;
+  }, [image.cropArea, image.originalHeight, image.originalWidth]);
+
   const aspectRatio = useMemo(() => {
     if (!globalSettings.keepAspectRatio) return undefined;
     if (!globalSettings.targetHeight) return 1;
-    return Number((globalSettings.targetWidth / globalSettings.targetHeight).toFixed(4));
-  }, [globalSettings.keepAspectRatio, globalSettings.targetHeight, globalSettings.targetWidth]);
+
+    const targetAspect = globalSettings.targetWidth / globalSettings.targetHeight;
+    const shouldSwap =
+      globalSettings.autoOrientation &&
+      targetAspect !== 0 &&
+      (targetAspect >= 1) !== (sourceAspect >= 1);
+
+    const ratio = shouldSwap ? 1 / targetAspect : targetAspect;
+    return Number(ratio.toFixed(4));
+  }, [
+    globalSettings.autoOrientation,
+    globalSettings.keepAspectRatio,
+    globalSettings.targetHeight,
+    globalSettings.targetWidth,
+    sourceAspect
+  ]);
 
   const handleCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
     setLocalArea(croppedAreaPixels);
@@ -136,8 +210,15 @@ export function ImageCard({ image }: Props) {
         </div>
       )}
 
-      <div className="relative">
-        <img src={image.previewUrl} alt={image.file.name} className="h-56 w-full object-cover" />
+      <div className="relative overflow-hidden rounded-t-xl bg-muted/60">
+        <div className="relative h-full w-full pt-[75%]">
+          <img
+            src={image.previewUrl}
+            alt={image.file.name}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </div>
         <div className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent p-3 text-xs text-white">
           <div className="flex flex-col">
             <span className="font-medium">{image.file.name}</span>
@@ -169,6 +250,34 @@ export function ImageCard({ image }: Props) {
             })}
           </p>
         </div>
+        {hasCrop && (
+          <div className="flex items-center gap-3 rounded-lg border border-border/70 bg-muted/40 px-3 py-2">
+            <div className="relative h-16 w-16 overflow-hidden rounded-md bg-background">
+              {cropPreviewUrl ? (
+                <img
+                  src={cropPreviewUrl}
+                  alt={`${image.file.name} crop preview`}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                  {isPreviewLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crop className="h-4 w-4" />}
+                </div>
+              )}
+              <Badge className="absolute bottom-1 right-1 bg-background/90 text-[10px] font-semibold">
+                {Math.round(image.cropArea?.zoom ? image.cropArea.zoom * 100 : 100)}%
+              </Badge>
+            </div>
+            <div className="flex flex-col text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">クロッププレビュー</span>
+              <span>
+                {Math.round(image.cropArea?.width ?? 0)} × {Math.round(image.cropArea?.height ?? 0)} px
+              </span>
+              <span className="text-[11px]">保存済みの調整結果を確認できます</span>
+            </div>
+          </div>
+        )}
         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Crop className="h-3.5 w-3.5" />

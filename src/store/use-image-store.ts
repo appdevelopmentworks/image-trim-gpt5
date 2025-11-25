@@ -8,6 +8,7 @@ const defaultSettings: ExportSettings = {
   targetWidth: 1080,
   targetHeight: 1080,
   keepAspectRatio: true,
+  autoOrientation: true,
   format: 'image/jpeg',
   quality: 0.92
 };

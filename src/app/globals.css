@@ -68,5 +68,18 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* 文字が小さすぎる要素の読みやすさを底上げ */
+  .text-xs {
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .text-sm {
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 }

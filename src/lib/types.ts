@@ -14,6 +14,7 @@ export interface ExportSettings {
   targetWidth: number;
   targetHeight: number;
   keepAspectRatio: boolean;
+  autoOrientation: boolean;
   format: ExportFormat;
   quality: number;
 }
