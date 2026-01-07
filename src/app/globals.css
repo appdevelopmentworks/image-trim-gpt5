@@ -72,6 +72,14 @@
     line-height: 1.6;
   }
 
+  select {
+    @apply text-foreground;
+  }
+
+  select option {
+    @apply bg-background text-foreground;
+  }
+
   /* 文字が小さすぎる要素の読みやすさを底上げ */
   .text-xs {
     font-size: 0.85rem;
